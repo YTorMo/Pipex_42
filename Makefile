@@ -6,7 +6,7 @@
 #    By: ytoro-mo <ytoro-mo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/20 10:11:20 by ytoro-mo          #+#    #+#              #
-#    Updated: 2022/06/20 13:35:23 by ytoro-mo         ###   ########.fr        #
+#    Updated: 2022/06/20 15:23:40 by ytoro-mo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,8 @@ INCLUDE		=	-I includes/					\
 RM			=	/bin/rm -f
 
 P_FILES	=		main.c \
-				exe_arg.c 
+				exe_arg.c \
+				ft_free.c
 
 PS_SRCS		=	$(addprefix $(DIR), $(P_FILES))
 P_OBJ		=	$(PS_SRCS:$(DIR)%.c=$(OBJ_DIR)%.o)
@@ -52,7 +53,7 @@ $(LIB)		:
 				/bin/mv $(LIB_DIR)$(LIB) .
 
 $(P_NAME)	:	$(P_OBJ) $(LIB)
-				$(CC) -fsanitize=address -o $@ $^
+				$(CC) -o $@ $^
 
 clean		:	
 				for dir in $(MODULES); do			\

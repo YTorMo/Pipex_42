@@ -6,7 +6,7 @@
 /*   By: ytoro-mo <ytoro-mo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/17 12:27:43 by ytoro-mo          #+#    #+#             */
-/*   Updated: 2022/06/20 13:24:00 by ytoro-mo         ###   ########.fr       */
+/*   Updated: 2022/06/20 15:28:48 by ytoro-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,34 +17,42 @@ int	main(int ac, char **av, char **env)
 	if (ac != 5)
 		return (EXIT_FAILURE);
 	ft_pipex(env, av);
-	//system("leaks -q push_swap");
 	return (0);
 }
+//system("leaks -q pipex");
 
 void	ft_pipex(char **env, char **av)
 {
 	int		fd[2];
 	pid_t	parent;
-	int		status;
 
-	status = 0;
 	pipe(fd);
 	parent = fork();
 	if (parent < 0)
-		return (perror("Fork:	"));
+		perror("Fork: ");
 	else if (!parent)
 		ft_child_proc(fd, av, env);
 	else
-		ft_parent_proc(fd, av, env, status);
+	{
+		parent = fork();
+		if (parent < 0)
+			perror("Fork: ");
+		else if (!parent)
+			ft_parent_proc(fd, av, env);
+		else
+		{
+			close(fd[0]);
+			close(fd[1]);
+		}
+	}
+	waitpid(parent, NULL, 0);
 }
 
 void	ft_child_proc(int *fd, char **av, char **env)
 {
 	int		fd_file_1;
-	int		i;
-	char	**paths;
+	char	*path;
 	char	**cmds;
-	char	*cmd;
 
 	fd_file_1 = open(av[1], O_RDONLY);
 	if (fd_file_1 == -1)
@@ -53,28 +61,23 @@ void	ft_child_proc(int *fd, char **av, char **env)
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[0]);
 	close(fd_file_1);
-	paths = ft_paths(env);
 	cmds = ft_cmds(av[2]);
-	i = -1;
-	while (paths[++i])
+	path = ft_path_finder(ft_paths(env), cmds[0]);
+	if (execve(path, cmds, env) == -1)
 	{
-		cmd = ft_strjoin(paths[i], cmds[0]);
-		execve(cmd, cmds, env);
-		free(cmd);
+		perror("Pipex: command not found");
+		ft_free(cmds);
+		free(path);
+		exit(EXIT_FAILURE);
 	}
-	exit(EXIT_FAILURE);
 }
 
-void	ft_parent_proc(int *fd, char **av, char **env, int status)
+void	ft_parent_proc(int *fd, char **av, char **env)
 {
 	int		fd_file_2;
-	int		i;
-	char	**paths;
+	char	*path;
 	char	**cmds;
-	char	*cmd;
 
-	status = 0;
-	//waitpid(-1, &status, 0);
 	fd_file_2 = open(av[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd_file_2 == -1)
 		return (perror("Pipex:	"));
@@ -82,14 +85,13 @@ void	ft_parent_proc(int *fd, char **av, char **env, int status)
 	dup2(fd_file_2, STDOUT_FILENO);
 	close(fd[1]);
 	close(fd_file_2);
-	paths = ft_paths(env);
 	cmds = ft_cmds(av[3]);
-	i = -1;
-	while (paths[++i])
+	path = ft_path_finder(ft_paths(env), cmds[0]);
+	if (execve(path, cmds, env) == -1)
 	{
-		cmd = ft_strjoin(paths[i], cmds[0]);
-		execve(cmd, cmds, env);
-		free(cmd);
+		perror("Pipex: command not found");
+		ft_free(cmds);
+		free(path);
+		exit(EXIT_FAILURE);
 	}
-	exit(EXIT_FAILURE);
 }
