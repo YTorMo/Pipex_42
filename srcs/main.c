@@ -6,7 +6,7 @@
 /*   By: ytoro-mo <ytoro-mo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/17 12:27:43 by ytoro-mo          #+#    #+#             */
-/*   Updated: 2022/06/20 11:39:52 by ytoro-mo         ###   ########.fr       */
+/*   Updated: 2022/06/20 13:24:00 by ytoro-mo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int	main(int ac, char **av, char **env)
 	if (ac != 5)
 		return (EXIT_FAILURE);
 	ft_pipex(env, av);
+	//system("leaks -q push_swap");
 	return (0);
 }
 
@@ -57,7 +58,7 @@ void	ft_child_proc(int *fd, char **av, char **env)
 	i = -1;
 	while (paths[++i])
 	{
-		cmd = ft_strjoin(paths[i], av[2]);
+		cmd = ft_strjoin(paths[i], cmds[0]);
 		execve(cmd, cmds, env);
 		free(cmd);
 	}
@@ -72,7 +73,8 @@ void	ft_parent_proc(int *fd, char **av, char **env, int status)
 	char	**cmds;
 	char	*cmd;
 
-	waitpid(-1, &status, 0);
+	status = 0;
+	//waitpid(-1, &status, 0);
 	fd_file_2 = open(av[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fd_file_2 == -1)
 		return (perror("Pipex:	"));
@@ -85,7 +87,7 @@ void	ft_parent_proc(int *fd, char **av, char **env, int status)
 	i = -1;
 	while (paths[++i])
 	{
-		cmd = ft_strjoin(paths[i], av[3]);
+		cmd = ft_strjoin(paths[i], cmds[0]);
 		execve(cmd, cmds, env);
 		free(cmd);
 	}

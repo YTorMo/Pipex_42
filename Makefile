@@ -6,7 +6,7 @@
 #    By: ytoro-mo <ytoro-mo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/20 10:11:20 by ytoro-mo          #+#    #+#              #
-#    Updated: 2022/06/20 10:20:11 by ytoro-mo         ###   ########.fr        #
+#    Updated: 2022/06/20 13:35:23 by ytoro-mo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,7 +52,7 @@ $(LIB)		:
 				/bin/mv $(LIB_DIR)$(LIB) .
 
 $(P_NAME)	:	$(P_OBJ) $(LIB)
-				$(CC) -o $@ $^
+				$(CC) -fsanitize=address -o $@ $^
 
 clean		:	
 				for dir in $(MODULES); do			\
